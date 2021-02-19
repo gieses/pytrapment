@@ -1,0 +1,3 @@
+include README.md LICENSE
+include versioneer.py
+include pytrapment/_version.py
