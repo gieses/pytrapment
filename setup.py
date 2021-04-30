@@ -24,7 +24,7 @@ AUTHOR = 'Sven Giese'
 REQUIRES_PYTHON = '>=3.8.0'
 KEYWORDS = ["Proteomics", "machine learning", "uniprot", "fasta"]
 # What packages are required for this module to be executed?
-REQUIRED = ['numpy', 'pyteomics', 'matpltotlib', 'seaborn', 'scipy']
+REQUIRED = ['numpy', 'pyteomics', 'matplotlib', 'seaborn', 'scipy']
 
 # What packages are optional?
 # 'fancy feature': ['django'],}
@@ -48,6 +48,7 @@ except FileNotFoundError:
 # Load the package's __version__.py module as a dictionary.
 about = {}
 project_slug = "pytrapment"
+
 
 class UploadCommand(Command):
     """Support setup.py upload."""

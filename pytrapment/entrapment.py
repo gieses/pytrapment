@@ -11,14 +11,20 @@ def compute_composition_df(seq_df):
     Compute the composition matrix for all proteins.
 
     Args:
-        seq_df: 
+        seq_df:  df, dataframe with sequences
 
     Returns:
-
+        df, with the composition of the proteins
     """
     # get composition table
     df_seq_comp = pd.DataFrame(
         list(seq_df["sequence"].apply(parser.amino_acid_composition).values)) * 1.0
+
+    # add column with 0s for amino acids that didnt occur in the protein fasta file
+    for i in parser.std_amino_acids:
+        if i not in df_seq_comp.columns:
+            df_seq_comp[i] = 0
+
     df_seq_comp = df_seq_comp.fillna(0.0)
     df_seq_comp.index = seq_df.index
     return df_seq_comp
@@ -33,7 +39,7 @@ def get_nearest_neighbor_proteins(fasta_host, fasta_trap):
         fasta_trap:
 
     Returns:
-
+        df, dataframe with proteins for host and entrapment database.
     """
     # make nearest neighbor thing
     # ger protein table
@@ -46,8 +52,8 @@ def get_nearest_neighbor_proteins(fasta_host, fasta_trap):
     df_peptides_trap = digest_protein_df(df_prot_trap)
 
     # perform the filtering
-    df_comp_trap, df_prot_trap = filter_trap_fasta(df_comp_trap, df_peptides_host,
-                                                   df_peptides_trap, df_prot_trap)
+    df_comp_trap, df_prot_trap = filter_trap_fasta(df_prot_trap, df_comp_trap,
+                                                   df_peptides_trap, df_peptides_host)
 
     # get best human protein matching by euclidean distance
     neighbor = []
@@ -61,27 +67,28 @@ def get_nearest_neighbor_proteins(fasta_host, fasta_trap):
         neighbor.append(df_comp_trap[ary == ary.min()].index.values[0])
         distances[ii] = ary.min()
     # print identifier for id mapping
-    #neighbors = [i.split("|")[1] for i in np.ravel(neighbor)]
+    # neighbors = [i.split("|")[1] for i in np.ravel(neighbor)]
     fasta_df_entrapment = df_prot_trap.loc[neighbor]
     # store seed-neighbor pairs
-    fasta_df_entrapment["host_seed"] =  df_comp_host.index
+    fasta_df_entrapment["host_seed"] = df_comp_host.index
 
     final_fasta_df = pd.concat([df_prot_host, fasta_df_entrapment])
-    final_fasta_df["db_type"] = ["host"] *len(df_prot_host) + ["trap"] * len(fasta_df_entrapment)
+    final_fasta_df["db_type"] = ["host"] * len(df_prot_host) + ["trap"] * len(fasta_df_entrapment)
     return final_fasta_df
 
 
-def filter_trap_fasta(df_comp_trap, df_peptides_host, df_peptides_trap, df_prot_trap):
+def filter_trap_fasta(df_prot_trap, df_comp_trap, df_peptides_trap, df_peptides_host):
     """
-    Remove proteins with peptides that also occur in the host database
+    Remove proteins with peptides that also occur in the host database.
+
     Args:
-        df_comp_trap:
-        df_peptides_host:
-        df_peptides_trap:
-        df_prot_trap:
+        df_comp_trap: df, protein entries from the entrapment database (composition)
+        df_peptides_host: df, peptides from the host fasta
+        df_peptides_trap: df, peptides from the entrapment fasta
+        df_prot_trap: df, proteins from the entrapment database
 
     Returns:
-
+        (df_comp_trap, df_prot_trap), returns a tuple of valid (unique) trapment ids.
     """
     # make sure I/L witht he same mass doesnt mess with overlapping peptides
     df_peptides_host["sequence"] = df_peptides_host["sequence"].str.replace("I", "L")
@@ -91,7 +98,7 @@ def filter_trap_fasta(df_comp_trap, df_peptides_host, df_peptides_trap, df_prot_
     df_peptides_trap = df_peptides_trap.set_index("sequence")
     df_joined = df_peptides_trap.join(df_peptides_host, rsuffix="_host", lsuffix="_trap",
                                       how="left")
-    blacklist_proteins_trap = df_joined.dropna()["protein_trap"].unique()
+    blacklist_proteins_trap = df_joined.dropna(subset=["protein_host"])["protein_trap"].unique()
     # drop proteins from dfs
     df_prot_trap = df_prot_trap.drop(blacklist_proteins_trap)
     df_comp_trap = df_comp_trap.drop(blacklist_proteins_trap)
@@ -142,7 +149,7 @@ def generete_peptides_proteins(FASTA, limit=-1):
     -------
     None.
 
-    """
+
     unique_peptides_HS = set()
     unique_peptides_EC = set()
 
@@ -161,20 +168,12 @@ def generete_peptides_proteins(FASTA, limit=-1):
             # digest
             new_peptides = parser.cleave(sequence, 'trypsin')
 
-            try:
-                OS_str = description.split("|")[2].split()[0]
-            except:
-                OS_str = "Pombe"
+            unique_peptides_EC.update(new_peptides)
+            unique_proteins_EC.update([sequence])
 
-            if ("_ECOLI" in OS_str) or ("Pombe" in OS_str):
-                unique_peptides_EC.update(new_peptides)
-                unique_proteins_EC.update([sequence])
-                ec += 1
-
-            elif ("_HUMAN" in OS_str):
-                unique_peptides_HS.update(new_peptides)
-                unique_proteins_HS.update([sequence])
-                hs += 1
+            unique_peptides_HS.update(new_peptides)
+            unique_proteins_HS.update([sequence])
+            hs += 1
 
             else:
                 print(description, sequence)
@@ -191,6 +190,8 @@ def generete_peptides_proteins(FASTA, limit=-1):
     df = pd.DataFrame({"Type": id_column, "OS": os_column,
                        "sequence": sequences})
     return df
+    """
+    return 1
 
 
 def digest_protein_df(df_fasta, rule="trypsin", min_length=6):
