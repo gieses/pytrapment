@@ -37,7 +37,11 @@ pytrapment -i host.fasta -t trap.fasta -o entrapment_db
 ```
 
 Make sure to have the correct paths to the fasta files. The out dir will contain the entrapment
-fasta and two qc plots for peptide and protein features.
+fasta and two qc plots for peptide and protein features. The repository contains example files
+which can be used as follows:
 
+>pytrapment -i sample_data/host.fasta -t sample_data/trap.fasta -o sample_data/
+
+The results (qc_plot.png and entrapment_data.fasta) can also be found in the sample_data folder.
 ## Contributors
 - Sven Giese
