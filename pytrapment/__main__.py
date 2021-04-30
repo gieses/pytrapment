@@ -18,22 +18,21 @@ def arg_parser():  # pragma: not covered
     """
     description = """
     pytrapment is a convenient tool to create entrapment databases for protemic MS analysis.
-    Entrapment databases are created by sampling for each source fasta a protein from the
-    entrapment database. This is done while conserving some important properties of the proteins
-    in the source file.
-    
+    Entrapment databases are created by sampling for each host fasta protein a similar protein
+    from the entrapment database. 
+        
     Use --help to see the command line arguments.
 
     Current Version: {}
     """.format(xv)
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("-i", "--in_fasta",
+    parser.add_argument("-i", "--fasta_host",
                         help="Input protein fasta file.",
-                        required=True, action="store", dest="in_fasta")
+                        required=True, action="store", dest="fasta_host")
 
-    parser.add_argument("-e", "--entrapment",
+    parser.add_argument("-e", "--fasta_trap",
                         help="Entrapment proteins.",
-                        required=True, action="store", dest="entrapment")
+                        required=True, action="store", dest="fasta_trap")
 
     parser.add_argument("-o", "--out_dir",
                         help="Directory to store the results",
@@ -71,4 +70,4 @@ if __name__ == "__main__":  # pragma: no cover
         os.makedirs(args.out_dir)
 
     # call function
-    pytrapment_runner(args.in_fasta, args.entrapment, args.outdir)
+    pytrapment_runner(args.fasta_host, args.fasta_trap, args.out_dir)

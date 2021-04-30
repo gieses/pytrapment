@@ -15,9 +15,8 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'pytrapment'
 DESCRIPTION = \
-    'pytrapment: create an entrapment database for proteomics mass spectrometry analysis'
+    'pytrapment: create an entrapment database for proteomic mass spectrometry analysis'
 URL = 'https://github.com/gieses/pytrapment'
-URL_DOKU = "https://xirt.readthedocs.io/en/latest/"
 URL_GITHUB = "https://github.com/gieses/pytrapment"
 URL_ISSUES = "https://github.com/gieses/pytrapment/issues"
 EMAIL = 'sven.giese@hpi.de'
@@ -25,7 +24,7 @@ AUTHOR = 'Sven Giese'
 REQUIRES_PYTHON = '>=3.8.0'
 KEYWORDS = ["Proteomics", "machine learning", "uniprot", "fasta"]
 # What packages are required for this module to be executed?
-REQUIRED = ['numpy', 'pyteomics', 'matpltotlib', 'seaborn', 'pyteomics']
+REQUIRED = ['numpy', 'pyteomics', 'matpltotlib', 'seaborn', 'scipy']
 
 # What packages are optional?
 # 'fancy feature': ['django'],}
@@ -49,9 +48,6 @@ except FileNotFoundError:
 # Load the package's __version__.py module as a dictionary.
 about = {}
 project_slug = "pytrapment"
-# with open(os.path.join(here, project_slug, '__version__.py')) as f:
-#     exec(f.read(), about)
-
 
 class UploadCommand(Command):
     """Support setup.py upload."""
@@ -107,7 +103,7 @@ setup(
     project_urls={
         "Bug Tracker": URL_ISSUES,
         "Source Code": URL_GITHUB,
-        "Documentation": URL_DOKU,
+        "Documentation": URL_GITHUB,
         "Homepage": URL},
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     # If your package is a single module, use this instead of 'packages':
