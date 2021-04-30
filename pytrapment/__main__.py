@@ -1,14 +1,12 @@
-"""xiRT main module to run the training and prediction."""
+"""pytrapment main module create entrapment dbs."""
 
 import argparse
-import logging
 import os
-import pickle
 import sys
 import time
-from datetime import datetime
+
 from pytrapment import __version__ as xv
-logger = logging.getLogger(__name__)
+from pytrapment import entrapment
 
 
 def arg_parser():  # pragma: not covered
@@ -43,7 +41,7 @@ def arg_parser():  # pragma: not covered
     return parser
 
 
-def pytrapment_runner(in_fasta, entrapment_fasta):
+def pytrapment_runner(fasta_host, fasta_trap):
     """
     Execute pytrapment.
 
@@ -55,12 +53,13 @@ def pytrapment_runner(in_fasta, entrapment_fasta):
         None
     """
     start_time = time.time()
-    logger.info("pytrapment fasta: {}".format(in_fasta))
-    logger.info("pytrapment entrapment: {}".format(entrapment_fasta))
-    pass
+    entrapment.get_nearest_neighbor_proteins(fasta_host, fasta_trap)
+    end_time = time.time()
+    print(f"Took {(end_time-start_time)/60.} minutes")
 
-def main():  # pragma: no cover
-    """Run xiRT main function."""
+
+if __name__ == "__main__":  # pragma: no cover
+    """Run pytrapment main function."""
     parser = arg_parser()
     try:
         args = parser.parse_args(sys.argv[1:])
@@ -71,31 +70,5 @@ def main():  # pragma: no cover
     if not os.path.exists(args.out_dir):
         os.makedirs(args.out_dir)
 
-    # create logger
-    logger = logging.getLogger('xirt')
-    logger.setLevel(logging.DEBUG)
-    # create console handler and set level to debug
-    ch = logging.FileHandler(os.path.join(args.out_dir, "pytrapment_logger.log"), "w")
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(ch)
-
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setLevel(logging.DEBUG)
-    sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(sh)
-
-    logger.info("command line call:")
-    logger.info("pytrapment -i {} -e {} -o {}".format(args.in_fasta, args.entrapment,
-                                                            args.outdir))
-    logger.info("Init logging file.")
-    logger.info("Starting Time: {}".format(datetime.now().strftime("%H:%M:%S")))
-    logger.info("Starting xiRT.")
-    logger.info("Using xiRT version: {}".format(xv))
-
     # call function
     pytrapment_runner(args.in_fasta, args.entrapment, args.outdir)
-
-
-if __name__ == "__main__":  # pragma: no cover
-    main()
