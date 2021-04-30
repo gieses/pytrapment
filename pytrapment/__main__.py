@@ -63,15 +63,19 @@ def main():  # pragma: no cover
         os.makedirs(args.out_dir)
 
     start_time = time.time()
+    print("Starting pytrapment.")
     fasta_df = entrapment.get_nearest_neighbor_proteins(args.fasta_host, args.fasta_trap)
+    print("Found neighbors.")
+    print("Write fasta.")
     _ = fasta.write(zip(fasta_df.index, fasta_df.sequence),
                     os.path.join(args.out_dir, f"entrapment_{today}.fasta"),
                     file_mode="w")
 
     end_time = time.time()
-    print(f"Took {(end_time-start_time)/60.} minutes")
+    print(f"Took {(end_time-start_time)/60.:.2f} minutes")
 
     # doing qc
+    print("Perform qc.")
     host_peptides = entrapment.digest_protein_df(fasta_df[fasta_df["db_type"] == "host"])
     trap_peptides = entrapment.digest_protein_df(fasta_df[fasta_df["db_type"] == "trap"])
 
@@ -82,7 +86,7 @@ def main():  # pragma: no cover
     features_df_trap["Type"] = "trap"
 
     qc.qc_peptides(features_df_host, features_df_trap, args.out_dir)
-
+    print("Done.")
 
 if __name__ == "__main__":  # pragma: no cover
     """Run pytrapment main function."""
