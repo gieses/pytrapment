@@ -1,3 +1,4 @@
 [run]
 omit =
     pytrapment/_version.py
+    pytrapment/__main__.py

@@ -2,7 +2,6 @@
 [![Twitter](https://flat.badgen.net/twitter/follow/SvenHGiese?icon=twitter)](https://twitter.com/SvenHGiese)
 [![Python 3.8.3](https://img.shields.io/badge/python-3.8.3-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
-
 A python package for creating entrapment databases.
 
 ---
@@ -34,8 +33,11 @@ pytrapment is available on pypi and can be installed via ```pip install pytrapme
 To use pytrapment, simply call the main program via a command line:
 
 ```
-pytrapment
+pytrapment -i host.fasta -t trap.fasta -o entrapment_db
 ```
 
+Make sure to have the correct paths to the fasta files. The out dir will contain the entrapment
+fasta and two qc plots for peptide and protein features.
+
 ## Contributors
-Sven Giese
+- Sven Giese

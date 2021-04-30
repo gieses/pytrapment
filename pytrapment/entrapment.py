@@ -1,8 +1,7 @@
 """Module to perform QC on the xiRT performance."""
 import numpy as np
 import pandas as pd
-from pyteomics import fasta
-from pyteomics import parser
+from pyteomics import fasta, parser
 from scipy.spatial import distance
 
 
@@ -134,64 +133,6 @@ def fasta2dataframe(FASTA):
     # make sure ordering is lost
     df = df.sample(frac=1, random_state=42)
     return df
-
-
-def generete_peptides_proteins(FASTA, limit=-1):
-    """
-    Generate a sets of peptides and proteins for the two species in the FASTA.
-
-    Parameters
-    ----------
-    FASTA : str
-        Location of the FASTA file..
-
-    Returns
-    -------
-    None.
-
-
-    unique_peptides_HS = set()
-    unique_peptides_EC = set()
-
-    unique_proteins_HS = set()
-    unique_proteins_EC = set()
-    ec = 0
-    hs = 0
-
-    with open(FASTA, mode='rt') as ffile:
-        for description, sequence in fasta.FASTA(ffile):
-            if limit != -1:
-                if hs == limit:
-                    print("Found enough proteins!)")
-                    break
-
-            # digest
-            new_peptides = parser.cleave(sequence, 'trypsin')
-
-            unique_peptides_EC.update(new_peptides)
-            unique_proteins_EC.update([sequence])
-
-            unique_peptides_HS.update(new_peptides)
-            unique_proteins_HS.update([sequence])
-            hs += 1
-
-            else:
-                print(description, sequence)
-
-    # create id for df
-    lengths = [len(unique_peptides_EC), len(unique_proteins_EC),
-               len(unique_peptides_HS), len(unique_proteins_HS)]
-    ids = ["Peptide", "Protein", "Peptide", "Protein"]
-    id_column = np.repeat(ids, lengths)
-    os_column = np.repeat(["E. coli", "E. coli", "H. sapiens", "H. sapiens"],
-                          lengths)
-    sequences = np.concatenate([list(unique_peptides_EC), list(unique_proteins_EC),
-                                list(unique_peptides_HS), list(unique_proteins_HS)])
-    df = pd.DataFrame({"Type": id_column, "OS": os_column,
-                       "sequence": sequences})
-    return df
-    """
-    return 1
 
 
 def digest_protein_df(df_fasta, rule="trypsin", min_length=6):

@@ -4,9 +4,12 @@ import argparse
 import os
 import sys
 import time
+from datetime import date
+
+from pyteomics import fasta
 
 from pytrapment import __version__ as xv
-from pytrapment import entrapment
+from pytrapment import entrapment, qc
 
 
 def arg_parser():  # pragma: not covered
@@ -40,14 +43,15 @@ def arg_parser():  # pragma: not covered
     return parser
 
 
-def main():
+def main():  # pragma: no cover
     """
     Execute pytrapment.
 
     Returns:
         None
     """
-    """Run pytrapment main function."""
+    today = date.today().strftime("%Y%m%d")
+
     parser = arg_parser()
     try:
         args = parser.parse_args(sys.argv[1:])
@@ -59,9 +63,25 @@ def main():
         os.makedirs(args.out_dir)
 
     start_time = time.time()
-    entrapment.get_nearest_neighbor_proteins(args.fasta_host, args.fasta_trap)
+    fasta_df = entrapment.get_nearest_neighbor_proteins(args.fasta_host, args.fasta_trap)
+    _ = fasta.write(zip(fasta_df.index, fasta_df.sequence),
+                    os.path.join(args.out_dir, f"entrapment_{today}.fasta"),
+                    file_mode="w")
+
     end_time = time.time()
     print(f"Took {(end_time-start_time)/60.} minutes")
+
+    # doing qc
+    host_peptides = entrapment.digest_protein_df(fasta_df[fasta_df["db_type"] == "host"])
+    trap_peptides = entrapment.digest_protein_df(fasta_df[fasta_df["db_type"] == "trap"])
+
+    features_df_host = qc.compute_sequence_features(host_peptides)
+    features_df_host["Type"] = "host"
+
+    features_df_trap = qc.compute_sequence_features(trap_peptides)
+    features_df_trap["Type"] = "trap"
+
+    qc.qc_peptides(features_df_host, features_df_trap, args.out_dir)
 
 
 if __name__ == "__main__":  # pragma: no cover

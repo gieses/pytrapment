@@ -1,13 +1,16 @@
 """Module to perform QC on the xiRT performance."""
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from pyteomics import electrochem
 
 sns.set(context="notebook", style="white", palette="deep", font_scale=1)
 
 
-def compute_features(peptides_df):
+def compute_sequence_features(peptides_df):
     """
     Compute features to evaluate database.
 
@@ -34,26 +37,44 @@ def compute_features(peptides_df):
         peptides_df[seq].str.count("H")
 
     # sequence properties
-    bp_seqs = peptides_df["sequence"].values
-    peptides_df["isoelectric_point"] = [electrochem.pi(x) for x in bp_seqs]
-    peptides_df["gravy"] = [electrochem.gravy(x) for x in bp_seqs]
+    peptides_df["isoelectric_point"] = [electrochem.pI(x) for x in peptides_df["sequence"].values]
+    peptides_df["gravy"] = [electrochem.gravy(x) for x in peptides_df["sequence"].values]
+    return peptides_df
 
-    # transform shape
-    df_melt = peptides_df.melt(id_vars=["Type", "OS", "sequence"],
-                               value_vars=["length", "KR", "aromatic", "acids", "isoelectric_point",
-                                           "gravy"])
-    df_melt["log_value"] = np.log2(df_melt["value"])
 
-    df_peptides = df_melt[df_melt["Type"] == "Peptide"]
-    df_proteins = df_melt[df_melt["Type"] == "Protein"]
+def qc_peptides(features_df_host, features_df_trap, out_dir):
+    """
+    Plot a boxplot for the different peptide features.
+
+    Args:
+        features_df_host: df, host peptides with features
+        features_df_trap: df, trap peptides with features
+        out_dir: str, path to store qc data
+
+    Returns:
+        None
+    """
+    # make single df
+    features_df = pd.concat([features_df_host, features_df_trap])
+
+    # melt for easier plotting
+    features_melt = features_df.melt(id_vars=["Type", "sequence"],
+                                     value_vars=['length', 'KR', 'aromatic', 'acids', 'aliphatic',
+                                                 'HGP', 'isoelectric_point', 'gravy'])
+
+    # some log-values
+    features_melt["log_value"] = np.log2(features_melt["value"])
 
     # peptides
-    g = sns.FacetGrid(df_peptides, col='variable', sharey=False, col_wrap=3)
-    g.map_dataframe(sns.boxplot, x='OS', y='value', color="darkgrey")
-    g.map_dataframe(sns.boxplot, x='OS', y='value', color="darkgrey")
+    g = sns.FacetGrid(features_melt, col='variable', sharey=False, col_wrap=4)
+    g.map_dataframe(sns.boxplot, x='Type', y='value', color="darkgrey")
+    g.map_dataframe(sns.boxplot, x='Type', y='value', color="darkgrey")
     g.axes[4].set(xlabel="Peptide Properties")
+    g.axes[7].set(xlabel="Peptide Properties")
+    g.axes[5].set(xlabel="Peptide Properties")
+    g.axes[6].set(xlabel="Peptide Properties")
     g.axes[0].set(ylabel="counts / value")
-    g.axes[3].set(ylabel="counts / value")
+    g.axes[4].set(ylabel="counts / value")
     plt.tight_layout()
 
-    return df_peptides, df_proteins
+    g.savefig(os.path.join(out_dir, "qc_plot.png"))

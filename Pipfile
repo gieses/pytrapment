@@ -8,7 +8,7 @@ numpy = "*"
 pyteomics = "*"
 sklearn = "*"
 seaborn = "*"
-matplotlib = "*"
+matplotlib = "3.2"
 
 [dev-packages]
 twine = "*"
