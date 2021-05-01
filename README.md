@@ -46,5 +46,6 @@ pytrapment -i sample_data/host.fasta -t sample_data/trap.fasta -o sample_data/
 ```
 
 The results (qc_plot.png and entrapment_data.fasta) can also be found in the sample_data folder.
+
 ## Contributors
 - Sven Giese
