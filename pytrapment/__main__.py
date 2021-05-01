@@ -88,6 +88,7 @@ def main():  # pragma: no cover
     qc.qc_peptides(features_df_host, features_df_trap, args.out_dir)
     print("Done.")
 
+
 if __name__ == "__main__":  # pragma: no cover
     """Run pytrapment main function."""
     main()
