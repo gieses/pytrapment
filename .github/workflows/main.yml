@@ -1,17 +1,17 @@
 name: CI
-on:  
-  pull_request:    
+on:
+  pull_request:
     branches:
-    - master  
+    - main  
   push:
     branches:
-    - master
-    
-jobs:  
-  build:     
+    - main
+
+jobs:
+  build:
    runs-on: ubuntu-latest
-   
-   steps:    
+
+   steps:
    - uses: actions/checkout@v1
    - name: Build and test with Docker
      run: |
