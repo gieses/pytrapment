@@ -16,4 +16,4 @@ jobs:
    - name: Build and test with Docker
      run: |
        docker build --tag pytrapment .
-       docker run --rm pytrapment pytest tests
+       docker run --rm pipenv run pytest
