@@ -1,3 +1,5 @@
+FROM python:3.8.3-slim
+
 # Setup a spot for the code
 WORKDIR /pytrapment
 
