@@ -7,6 +7,7 @@ WORKDIR /pytrapment
 COPY Pipfile Pipfile
 RUN pip install pipenv
 RUN pipenv install Pipfile --dev
+RUN pipenv shell
 
 COPY pytrapment pytrapment/
 COPY tests tests/
