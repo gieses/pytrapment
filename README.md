@@ -1,6 +1,7 @@
 [![GitHub](https://flat.badgen.net/github/license/gieses/pytrapment)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Twitter](https://flat.badgen.net/twitter/follow/SvenHGiese?icon=twitter)](https://twitter.com/SvenHGiese)
 [![Python 3.8.3](https://img.shields.io/badge/python-3.8.3-blue.svg)](https://www.python.org/downloads/release/python-370/)
+[![CI](https://github.com/gieses/pytrapment/actions/workflows/main.yml/badge.svg)](https://github.com/gieses/pytrapment/actions/workflows/main.yml)
 
 A python package for creating entrapment databases.
 
